@@ -1,0 +1,12 @@
+Title,Description,Labels,State,Confidential
+Translate homepage,Complete translation of the homepage to ensure language consistency and user-friendliness for non-native users,Frontend,opened,FALSO
+Add full CRUD functionality,"Implement Create, Read, Update, and Delete operations for all core entities in the platform, ensuring data integrity and seamless interaction with the database","Backend, Database",opened,FALSO
+Add role to user model,"Enhance the user model by adding role-based attributes (e.g., admin, representative) to manage permissions and access control effectively",Backend,opened,FALSO
+Add password fields to registration form,"Integrate password and confirm password fields in the registration form, with validation rules for strength and security requirements (e.g., minimum length, special characters)","Frontend, Backend",opened,FALSO
+Implement request management dashboard,"Create a dashboard for managing and monitoring requests, including options for approval, rejection, and detailed tracking of status","Frontend, Backend",opened,FALSO
+Develop test suite,"Design and implement automated tests to validate the core functionalities of the platform, ensuring robustness and preventing regressions",Testing,opened,FALSO
+Implement email verification system,"Add functionality to send email verification links to newly registered users, ensuring the authenticity of their email addresses","Backend, Security",opened,FALSO
+Implement logging system,"Create a logging system to track user activities, API calls, and potential security events, providing insights for debugging and monitoring",Backend,opened,FALSO
+Document APIs (Swagger),"Generate comprehensive API documentation using Swagger, including endpoints, methods, parameters, and expected responses to facilitate development and integration",Documentation,opened,FALSO
+Replace FFGA title,Change the title of the platform from FFGA to a more appropriate and finalized project name for branding purposes,Frontend,opened,FALSO
+Add password reset functionality,"Implement a secure password reset mechanism, allowing users to recover access through email-based token authentication","Backend, Security",opened,FALSO

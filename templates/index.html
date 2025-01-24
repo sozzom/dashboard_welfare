@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Data Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">Privacy Data Dashboard</a>
+        </div>
+    </nav>
+
+    <header class="hero-section text-white text-center py-5">
+        <div class="container">
+            <h1 class="display-4 mb-4">Proteggi i Tuoi Dati Sensibili</h1>
+            <p class="lead mb-4">Strumento avanzato per la minimizzazione e protezione dei dati nel rispetto del GDPR</p>
+            
+            <div class="row mb-5 g-4">
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body d-flex flex-column align-items-center p-4">
+                            <div class="icon-box mb-3">
+                                <i class="bi bi-shield-lock fs-1 text-primary"></i>
+                            </div>
+                            <h3 class="card-title h4 text-primary mb-3">Pseudonimizzazione</h3>
+                            <p class="card-text text-muted text-center">Sostituisci identificatori diretti con codici univoci per proteggere l'identità degli individui.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body d-flex flex-column align-items-center p-4">
+                            <div class="icon-box mb-3">
+                                <i class="bi bi-columns-gap fs-1 text-primary"></i>
+                            </div>
+                            <h3 class="card-title h4 text-primary mb-3">Rimozione Colonne</h3>
+                            <p class="card-text text-muted text-center">Elimina attributi sensibili o non necessari dal dataset.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm feature-card">
+                        <div class="card-body d-flex flex-column align-items-center p-4">
+                            <div class="icon-box mb-3">
+                                <i class="bi bi-graph-up fs-1 text-primary"></i>
+                            </div>
+                            <h3 class="card-title h4 text-primary mb-3">Analisi del Rischio</h3>
+                            <p class="card-text text-muted text-center">Monitora in tempo reale il livello di rischio di re-identificazione.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form action="/" method="POST" enctype="multipart/form-data" class="mb-4">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3">
+                            <input type="file" class="form-control" id="fileInput" name="file" accept=".csv" required>
+                            <button class="btn btn-light" type="submit">Carica Dataset</button>
+                        </div>
+                        <div class="form-text text-white">Il file deve essere in formato CSV e codificato in UTF-8</div>
+                    </div>
+                </div>
+            </form>
+            
+            {% if error %}
+            <div class="alert alert-danger" role="alert">{{ error }}</div>
+            {% endif %}
+
+            {% if success %}
+            <div class="alert alert-success" role="alert">{{ success }}</div>
+            {% endif %}
+        </div>
+    </header>
+
+    {% if preview %}
+    <section class="py-5">
+        <div class="container">
+            {% if risk_analysis %}
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Analisi del Rischio</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h5>Record Totali</h5>
+                            <p class="h3">{{ risk_analysis.total_records }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Record Unici</h5>
+                            <p class="h3">{{ risk_analysis.unique_records }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h5>Rischio (%)</h5>
+                            <p class="h3">{{ risk_analysis.risk_score }}%</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Pseudonimizzazione</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Seleziona colonne da pseudonimizzare:</label>
+                                {% for column in columns %}
+                                <div class="form-check">
+                                    <input class="form-check-input pseudonymize-checkbox" 
+                                           type="checkbox" 
+                                           value="{{ column }}" 
+                                           id="pseudo_{{ loop.index }}">
+                                    <label class="form-check-label" for="pseudo_{{ loop.index }}">
+                                        {{ column }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Rimozione Colonne</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Seleziona colonne da rimuovere:</label>
+                                {% for column in columns %}
+                                <div class="form-check">
+                                    <input class="form-check-input remove-checkbox" 
+                                           type="checkbox" 
+                                           value="{{ column }}" 
+                                           id="remove_{{ loop.index }}">
+                                    <label class="form-check-label" for="remove_{{ loop.index }}">
+                                        {{ column }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="text-center mb-4">Anteprima Dataset</h2>
+            <div class="table-responsive" id="previewContainer">
+                {{ preview | safe }}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Add click handlers for feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const cardTitle = this.querySelector('.card-title').textContent.toLowerCase();
+                let targetCard;
+                
+                if (cardTitle.includes('pseudonimizzazione')) {
+                    targetCard = document.querySelector('.card-header h5');
+                    const cards = document.querySelectorAll('.card-header h5');
+                    cards.forEach(header => {
+                        if (header.textContent.includes('Pseudonimizzazione')) {
+                            targetCard = header.closest('.card');
+                        }
+                    });
+                } else if (cardTitle.includes('rimozione')) {
+                    const cards = document.querySelectorAll('.card-header h5');
+                    cards.forEach(header => {
+                        if (header.textContent.includes('Rimozione Colonne')) {
+                            targetCard = header.closest('.card');
+                        }
+                    });
+                } else if (cardTitle.includes('analisi')) {
+                    targetCard = document.querySelector('.card-header.bg-info').closest('.card');
+                }
+                
+                if (targetCard) {
+                    targetCard.style.transition = 'background-color 0.3s ease';
+                    targetCard.style.backgroundColor = '#e9ecef';
+                    setTimeout(() => {
+                        targetCard.style.backgroundColor = '';
+                    }, 500);
+                    
+                    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        });
+    </script>
+
+    {% if preview %}
+    <script>
+        async function updateView(data) {
+            document.getElementById('previewContainer').innerHTML = data.preview;
+            const riskSection = document.querySelector('.card-body .row');
+            if (riskSection && data.risk_analysis) {
+                riskSection.innerHTML = `
+                    <div class="col-md-4">
+                        <h5>Record Totali</h5>
+                        <p class="h3">${data.risk_analysis.total_records}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Record Unici</h5>
+                        <p class="h3">${data.risk_analysis.unique_records}</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>Rischio (%)</h5>
+                        <p class="h3">${data.risk_analysis.risk_score}%</p>
+                    </div>
+                `;
+            }
+        }
+
+        document.querySelectorAll('.pseudonymize-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', async (e) => {
+                const column = e.target.value;
+                const action = e.target.checked ? 'add' : 'remove';
+
+                try {
+                    const response = await fetch('/toggle_pseudonymize', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ column, action })
+                    });
+
+                    const data = await response.json();
+                    if (data.error) {
+                        alert(data.error);
+                        e.target.checked = !e.target.checked;
+                    } else {
+                        await updateView(data);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Errore durante l\'operazione');
+                    e.target.checked = !e.target.checked;
+                }
+            });
+        });
+
+        document.querySelectorAll('.remove-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', async (e) => {
+                const column = e.target.value;
+                const action = e.target.checked ? 'add' : 'remove';
+
+                try {
+                    const response = await fetch('/toggle_column', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ column, action })
+                    });
+
+                    const data = await response.json();
+                    if (data.error) {
+                        alert(data.error);
+                        e.target.checked = !e.target.checked;
+                    } else {
+                        await updateView(data);
+                    }
+                } catch (error) {
+                    console.error(error);
+                    alert('Errore durante l\'operazione');
+                    e.target.checked = !e.target.checked;
+                }
+            });
+        });
+    </script>
+    {% endif %}
+</body>
+</html>
