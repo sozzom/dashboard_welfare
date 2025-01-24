@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, Response
 import os
 import pandas as pd
 import io
@@ -176,6 +176,30 @@ def toggle_column():
         })
     except Exception as e:
         return jsonify({"error": f"Errore durante l'operazione: {str(e)}"}), 500
+
+@app.route("/download_csv", methods=["GET"])
+def download_csv():
+    if 'current_df' not in session:
+        return jsonify({"error": "Nessun dataset disponibile"}), 400
+        
+    try:
+        df = pd.read_json(session['current_df'])
+        output = io.StringIO()
+        df.to_csv(output, index=False)
+        
+        return Response(
+            output.getvalue(),
+            mimetype="text/csv",
+            headers={"Content-Disposition": "attachment;filename=dataset_modificato.csv"}
+        )
+    except Exception as e:
+        return jsonify({"error": f"Errore durante il download: {str(e)}"}), 500
+
+
+@app.route("/privacy", methods=["GET"])
+def privacy():
+    return render_template("privacy.html")
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
