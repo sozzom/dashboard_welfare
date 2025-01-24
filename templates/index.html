@@ -61,9 +61,16 @@
                     <div class="col-md-6">
                         <div class="input-group mb-3">
                             <input type="file" class="form-control" id="fileInput" name="file" accept=".csv" required>
-                            <button class="btn btn-light" type="submit">Carica Dataset</button>
+                            <button class="btn btn-light" type="submit" id="uploadBtn" disabled>Carica Dataset</button>
                         </div>
                         <div class="form-text text-white">Il file deve essere in formato CSV e codificato in UTF-8</div>
+                        <div class="form-check mt-3">
+                            <input class="form-check-input" type="checkbox" id="privacyConsent" required>
+                            <label class="form-check-label text-white" for="privacyConsent">
+                                Ho letto e accetto l'<a href="/privacy" class="text-white text-decoration-underline">informativa sulla privacy</a>. 
+                                I dati verranno trattati secondo il GDPR e cancellati dopo la sessione.
+                            </label>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -171,6 +178,11 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
+        // Privacy consent handler
+        document.getElementById('privacyConsent').addEventListener('change', function() {
+            document.getElementById('uploadBtn').disabled = !this.checked;
+        });
+
         // Add click handlers for feature cards
         document.querySelectorAll('.feature-card').forEach(card => {
             card.addEventListener('click', function() {
