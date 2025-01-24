@@ -4,20 +4,36 @@ import pandas as pd
 import io
 import hashlib
 import json
+from datetime import timedelta
+
 
 app = Flask(__name__)
 UPLOAD_FOLDER = 'datasets'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.secret_key = 'super_secret_key'
+app.config.update(
+    UPLOAD_FOLDER=UPLOAD_FOLDER,
+    SECRET_KEY='super_secret_key',  # In produzione, usa una chiave sicura
+    SESSION_COOKIE_SECURE=True,      # Solo HTTPS
+    SESSION_COOKIE_HTTPONLY=True,    # Previene accesso JS
+    SESSION_COOKIE_SAMESITE='Lax',   # Protezione CSRF
+    PERMANENT_SESSION_LIFETIME=timedelta(minutes=30)
+)
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def validate_csv(file):
     try:
-        content = file.read().decode('utf-8')
+        content = file.read()
+        if len(content) > 10 * 1024 * 1024:  # 10MB limit
+            return None, "File troppo grande (max 10MB)"
+            
+        content_str = content.decode('utf-8')
+        if any(suspicious in content_str.lower() for suspicious in ['<script', 'javascript:', 'data:']):
+            return None, "Contenuto non valido"
+
         separators = [',', ';', '\t']
         for sep in separators:
             try:
-                data = pd.read_csv(io.StringIO(content), sep=sep)
+                data = pd.read_csv(io.StringIO(content_str), sep=sep)
                 if data.empty:
                     return None, "Il file è vuoto"
                 if len(data.columns) < 2:
@@ -28,6 +44,10 @@ def validate_csv(file):
         return None, "Formato file non valido"
     except Exception as e:
         return None, f"Errore: {str(e)}"
+
+@app.before_request
+def before_request():
+    session.permanent = True  # Abilita scadenza sessione
 
 def pseudonymize_column(df, column_name):
     df[column_name] = df[column_name].astype(str).apply(
@@ -61,6 +81,10 @@ def analyze_risk(df):
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
+        # Verifica consenso privacy
+        if not request.form.get('privacy_consent'):
+            return render_template("index.html", error="È necessario accettare l'informativa privacy")
+            
         if "file" not in request.files:
             return render_template("index.html", error="Nessun file selezionato")
         
@@ -76,11 +100,11 @@ def home():
             return render_template("index.html", error=error)
         
         try:
-            # Salva sia il DataFrame originale che quello modificabile
+            # Salva DataFrame in sessione
             session['original_df'] = data.to_json()
             session['current_df'] = data.to_json()
-            session['pseudonymized_columns'] = json.dumps([])  # Tiene traccia delle colonne pseudonimizzate
-            session['removed_columns'] = json.dumps([])  # Tiene traccia delle colonne rimosse
+            session['pseudonymized_columns'] = json.dumps([])
+            session['removed_columns'] = json.dumps([])
             
             preview = data.head(10).to_html(classes="table table-striped table-bordered", justify="left")
             risk_analysis = analyze_risk(data)

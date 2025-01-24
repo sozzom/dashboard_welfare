@@ -7,6 +7,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -64,13 +67,7 @@
                             <button class="btn btn-light" type="submit" id="uploadBtn" disabled>Carica Dataset</button>
                         </div>
                         <div class="form-text text-white">Il file deve essere in formato CSV e codificato in UTF-8</div>
-                        <div class="form-check mt-3">
-                            <input class="form-check-input" type="checkbox" id="privacyConsent" required>
-                            <label class="form-check-label text-white" for="privacyConsent">
-                                Ho letto e accetto l'<a href="/privacy" class="text-white text-decoration-underline">informativa sulla privacy</a>. 
-                                I dati verranno trattati secondo il GDPR e cancellati dopo la sessione.
-                            </label>
-                        </div>
+                        <div id="privacy-consent-container"></div>
                     </div>
                 </div>
             </form>
@@ -178,10 +175,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>
-        // Privacy consent handler
-        document.getElementById('privacyConsent').addEventListener('change', function() {
-            document.getElementById('uploadBtn').disabled = !this.checked;
-        });
 
         // Add click handlers for feature cards
         document.querySelectorAll('.feature-card').forEach(card => {
@@ -302,6 +295,89 @@
         });
     </script>
     {% endif %}
+
+    <script type="text/babel">
+        const PrivacyConsent = ({ onConsentChange }) => {
+  return (
+    <div className="bg-white rounded p-4 mt-4 shadow-sm">
+      <h5 className="mb-3 text-primary fw-bold">Informativa sul Trattamento dei Dati</h5>
+      
+      <div className="text-dark mb-4">
+        <ul className="list-unstyled">
+          <li className="mb-2">
+            <i className="bi bi-check2-circle text-primary me-2"></i>
+            I dati verranno trattati solo per minimizzazione e analisi privacy
+          </li>
+          <li className="mb-2">
+            <i className="bi bi-clock text-primary me-2"></i>
+            I dati vengono conservati solo in memoria per 30 minuti
+          </li>
+          <li className="mb-2">
+            <i className="bi bi-shield-check text-primary me-2"></i>
+            Non viene effettuato alcun trasferimento verso terzi
+          </li>
+        </ul>
+      </div>
+      
+      <div className="form-check mb-3 ps-4">
+        <input 
+          type="checkbox" 
+          name="consent_process"
+          id="consent_process"
+          className="form-check-input"
+          onChange={(e) => onConsentChange(e.target.checked)}
+          required 
+        />
+        <label className="form-check-label text-dark" htmlFor="consent_process">
+          Acconsento al trattamento dei dati per finalità di minimizzazione
+        </label>
+      </div>
+      
+      <div className="form-check mb-3 ps-4">
+        <input 
+          type="checkbox"
+          name="consent_analysis" 
+          id="consent_analysis"
+          className="form-check-input"
+          onChange={(e) => onConsentChange(e.target.checked)}
+          required
+        />
+        <label className="form-check-label text-dark" htmlFor="consent_analysis">
+          Acconsento all'analisi del rischio privacy
+        </label>
+      </div>
+      
+      <div className="form-check ps-4">
+        <input 
+          type="checkbox"
+          name="privacy_consent"
+          id="privacy_consent" 
+          className="form-check-input"
+          onChange={(e) => onConsentChange(e.target.checked)}
+          required
+        />
+        <label className="form-check-label text-dark" htmlFor="privacy_consent">
+          Ho letto e accetto l'
+          <a href="/privacy" 
+             target="_blank" 
+             className="text-primary text-decoration-none hover-underline">
+            informativa sulla privacy
+          </a>
+        </label>
+      </div>
+    </div>
+  );
+};
+        
+        ReactDOM.render(
+          <PrivacyConsent 
+            onConsentChange={(checked) => {
+              document.getElementById('uploadBtn').disabled = !checked;
+            }}
+          />,
+          document.getElementById('privacy-consent-container')
+        );
+        </script>
 
     <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
