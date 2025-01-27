@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,7 @@
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
@@ -21,8 +23,9 @@
     <header class="hero-section text-white text-center py-5">
         <div class="container">
             <h1 class="display-4 mb-4">Proteggi i Tuoi Dati Sensibili</h1>
-            <p class="lead mb-4">Strumento avanzato per la minimizzazione e protezione dei dati nel rispetto del GDPR</p>
-            
+            <p class="lead mb-4">Strumento avanzato per la minimizzazione e protezione dei dati nel rispetto del GDPR
+            </p>
+
             <div class="row mb-5 g-4">
                 <div class="col-md-4">
                     <div class="card h-100 border-0 shadow-sm feature-card">
@@ -31,7 +34,8 @@
                                 <i class="bi bi-shield-lock fs-1 text-primary"></i>
                             </div>
                             <h3 class="card-title h4 text-primary mb-3">Pseudonimizzazione</h3>
-                            <p class="card-text text-muted text-center">Sostituisci identificatori diretti con codici univoci per proteggere l'identità degli individui.</p>
+                            <p class="card-text text-muted text-center">Sostituisci identificatori diretti con codici
+                                univoci per proteggere l'identità degli individui.</p>
                         </div>
                     </div>
                 </div>
@@ -42,7 +46,8 @@
                                 <i class="bi bi-columns-gap fs-1 text-primary"></i>
                             </div>
                             <h3 class="card-title h4 text-primary mb-3">Rimozione Colonne</h3>
-                            <p class="card-text text-muted text-center">Elimina attributi sensibili o non necessari dal dataset.</p>
+                            <p class="card-text text-muted text-center">Elimina attributi sensibili o non necessari dal
+                                dataset.</p>
                         </div>
                     </div>
                 </div>
@@ -53,7 +58,8 @@
                                 <i class="bi bi-graph-up fs-1 text-primary"></i>
                             </div>
                             <h3 class="card-title h4 text-primary mb-3">Analisi del Rischio</h3>
-                            <p class="card-text text-muted text-center">Monitora in tempo reale il livello di rischio di re-identificazione.</p>
+                            <p class="card-text text-muted text-center">Monitora in tempo reale il livello di rischio di
+                                re-identificazione.</p>
                         </div>
                     </div>
                 </div>
@@ -71,7 +77,7 @@
                     </div>
                 </div>
             </form>
-            
+
             {% if error %}
             <div class="alert alert-danger" role="alert">{{ error }}</div>
             {% endif %}
@@ -120,10 +126,8 @@
                                 <label class="form-label">Seleziona colonne da pseudonimizzare:</label>
                                 {% for column in columns %}
                                 <div class="form-check">
-                                    <input class="form-check-input pseudonymize-checkbox" 
-                                           type="checkbox" 
-                                           value="{{ column }}" 
-                                           id="pseudo_{{ loop.index }}">
+                                    <input class="form-check-input pseudonymize-checkbox" type="checkbox"
+                                        value="{{ column }}" id="pseudo_{{ loop.index }}">
                                     <label class="form-check-label" for="pseudo_{{ loop.index }}">
                                         {{ column }}
                                     </label>
@@ -143,10 +147,8 @@
                                 <label class="form-label">Seleziona colonne da rimuovere:</label>
                                 {% for column in columns %}
                                 <div class="form-check">
-                                    <input class="form-check-input remove-checkbox" 
-                                           type="checkbox" 
-                                           value="{{ column }}" 
-                                           id="remove_{{ loop.index }}">
+                                    <input class="form-check-input remove-checkbox" type="checkbox" value="{{ column }}"
+                                        id="remove_{{ loop.index }}">
                                     <label class="form-check-label" for="remove_{{ loop.index }}">
                                         {{ column }}
                                     </label>
@@ -178,10 +180,10 @@
 
         // Add click handlers for feature cards
         document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('click', function() {
+            card.addEventListener('click', function () {
                 const cardTitle = this.querySelector('.card-title').textContent.toLowerCase();
                 let targetCard;
-                
+
                 if (cardTitle.includes('pseudonimizzazione')) {
                     targetCard = document.querySelector('.card-header h5');
                     const cards = document.querySelectorAll('.card-header h5');
@@ -200,14 +202,14 @@
                 } else if (cardTitle.includes('analisi')) {
                     targetCard = document.querySelector('.card-header.bg-info').closest('.card');
                 }
-                
+
                 if (targetCard) {
                     targetCard.style.transition = 'background-color 0.3s ease';
                     targetCard.style.backgroundColor = '#e9ecef';
                     setTimeout(() => {
                         targetCard.style.backgroundColor = '';
                     }, 500);
-                    
+
                     targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             });
@@ -248,7 +250,7 @@
                 try {
                     const response = await fetch('/toggle_pseudonymize', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ column, action })
                     });
 
@@ -275,7 +277,7 @@
                 try {
                     const response = await fetch('/toggle_column', {
                         method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ column, action })
                     });
 
@@ -298,86 +300,111 @@
 
     <script type="text/babel">
         const PrivacyConsent = ({ onConsentChange }) => {
-  return (
-    <div className="bg-white rounded p-4 mt-4 shadow-sm">
-      <h5 className="mb-3 text-primary fw-bold">Informativa sul Trattamento dei Dati</h5>
-      
-      <div className="text-dark mb-4">
-        <ul className="list-unstyled">
-          <li className="mb-2">
-            <i className="bi bi-check2-circle text-primary me-2"></i>
-            I dati verranno trattati solo per minimizzazione e analisi privacy
-          </li>
-          <li className="mb-2">
-            <i className="bi bi-clock text-primary me-2"></i>
-            I dati vengono conservati solo in memoria per 30 minuti
-          </li>
-          <li className="mb-2">
-            <i className="bi bi-shield-check text-primary me-2"></i>
-            Non viene effettuato alcun trasferimento verso terzi
-          </li>
-        </ul>
-      </div>
-      
-      <div className="form-check mb-3 ps-4">
-        <input 
-          type="checkbox" 
-          name="consent_process"
-          id="consent_process"
-          className="form-check-input"
-          onChange={(e) => onConsentChange(e.target.checked)}
-          required 
-        />
-        <label className="form-check-label text-dark" htmlFor="consent_process">
-          Acconsento al trattamento dei dati per finalità di minimizzazione
-        </label>
-      </div>
-      
-      <div className="form-check mb-3 ps-4">
-        <input 
-          type="checkbox"
-          name="consent_analysis" 
-          id="consent_analysis"
-          className="form-check-input"
-          onChange={(e) => onConsentChange(e.target.checked)}
-          required
-        />
-        <label className="form-check-label text-dark" htmlFor="consent_analysis">
-          Acconsento all'analisi del rischio privacy
-        </label>
-      </div>
-      
-      <div className="form-check ps-4">
-        <input 
-          type="checkbox"
-          name="privacy_consent"
-          id="privacy_consent" 
-          className="form-check-input"
-          onChange={(e) => onConsentChange(e.target.checked)}
-          required
-        />
-        <label className="form-check-label text-dark" htmlFor="privacy_consent">
-          Ho letto e accetto l'
-          <a href="/privacy" 
-             target="_blank" 
-             className="text-primary text-decoration-none hover-underline">
-            informativa sulla privacy
-          </a>
-        </label>
-      </div>
-    </div>
-  );
+    return (
+        <div className="bg-white rounded p-4 mt-4 shadow-sm">
+                    <h5 className="mb-3 text-primary fw-bold">Informativa sul Trattamento dei Dati</h5>
+
+                    <div className="text-dark mb-4">
+                        <div className="accordion" id="infoAccordion">
+                            <div className="accordion-item">
+                                <h2 className="accordion-header">
+                                    <button className="accordion-button collapsed d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        <i className="bi bi-shield-fill-check text-primary fs-4 me-3"></i>
+                                        I dati verranno trattati solo per minimizzazione e analisi privacy
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" className="accordion-collapse collapse" data-bs-parent="#infoAccordion">
+                                    <div className="accordion-body">
+                                        Dettagli sul trattamento dei dati per la minimizzazione e l'analisi privacy.
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="accordion-item">
+                                <h2 className="accordion-header">
+                                    <button className="accordion-button collapsed d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        <i className="bi bi-lock-fill text-primary fs-4 me-3"></i>
+                                        I dati vengono conservati solo in memoria per 30 minuti
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#infoAccordion">
+                                    <div className="accordion-body">
+                                        Dettagli sulla conservazione temporanea dei dati.
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="accordion-item">
+                                <h2 className="accordion-header">
+                                    <button className="accordion-button collapsed d-flex align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        <i className="bi bi-eye-slash-fill text-primary fs-4 me-3"></i>
+                                        Non viene effettuato alcun trasferimento verso terzi
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" className="accordion-collapse collapse" data-bs-parent="#infoAccordion">
+                                    <div className="accordion-body">
+                                        Dettagli sulla politica di non trasferimento dei dati.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+            <div className="form-check mb-3 d-flex align-items-center">
+                <input
+                    type="checkbox"
+                    name="consent_process"
+                    id="consent_process"
+                    className="form-check-input me-2"
+                    onChange={(e) => onConsentChange(e.target.checked)}
+                    required
+                />
+                <label className="form-check-label text-dark" htmlFor="consent_process">
+                    Acconsento al trattamento dei dati per finalità di minimizzazione
+                </label>
+            </div>
+
+            <div className="form-check mb-3 d-flex align-items-center">
+                <input
+                    type="checkbox"
+                    name="consent_analysis"
+                    id="consent_analysis"
+                    className="form-check-input me-2"
+                    onChange={(e) => onConsentChange(e.target.checked)}
+                    required
+                />
+                <label className="form-check-label text-dark" htmlFor="consent_analysis">
+                    Acconsento all'analisi del rischio privacy
+                </label>
+            </div>
+
+            <div className="form-check d-flex align-items-center">
+                <input
+                    type="checkbox"
+                    name="privacy_consent"
+                    id="privacy_consent"
+                    className="form-check-input me-2"
+                    onChange={(e) => onConsentChange(e.target.checked)}
+                    required
+                />
+                <label className="form-check-label text-dark" htmlFor="privacy_consent">
+                    Ho letto e accetto l'
+                    <a href="/privacy" target="_blank" className="text-primary text-decoration-none hover-underline">
+                        informativa sulla privacy
+                    </a>
+                </label>
+            </div>
+        </div>
+    );
 };
-        
-        ReactDOM.render(
-          <PrivacyConsent 
-            onConsentChange={(checked) => {
-              document.getElementById('uploadBtn').disabled = !checked;
-            }}
-          />,
-          document.getElementById('privacy-consent-container')
-        );
-        </script>
+
+ReactDOM.render(
+    <PrivacyConsent
+        onConsentChange={(checked) => {
+            document.getElementById('uploadBtn').disabled = !checked;
+        }}
+    />,
+    document.getElementById('privacy-consent-container')
+);
+    </script>
 
     <footer class="bg-light py-4 mt-5">
         <div class="container text-center">
