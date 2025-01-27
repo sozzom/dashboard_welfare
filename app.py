@@ -5,6 +5,9 @@ import io
 import hashlib
 import json
 from datetime import timedelta
+from privacy_assistant import PrivacyAssistant, format_suggestions_html
+
+
 
 
 app = Flask(__name__)
@@ -17,6 +20,8 @@ app.config.update(
     SESSION_COOKIE_SAMESITE='Lax',   # Protezione CSRF
     PERMANENT_SESSION_LIFETIME=timedelta(minutes=30)
 )
+
+privacy_assistant = PrivacyAssistant()
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -100,6 +105,10 @@ def home():
             return render_template("index.html", error=error)
         
         try:
+            # Genera suggerimenti usando l'assistente
+            suggestions = privacy_assistant.generate_suggestions(data)
+            suggestions_html = format_suggestions_html(suggestions)
+            
             # Salva DataFrame in sessione
             session['original_df'] = data.to_json()
             session['current_df'] = data.to_json()
@@ -113,11 +122,10 @@ def home():
                                 preview=preview,
                                 columns=data.columns.tolist(),
                                 risk_analysis=risk_analysis,
+                                suggestions=suggestions_html,
                                 success=f"File caricato: {len(data)} righe, {len(data.columns)} colonne")
         except Exception as e:
             return render_template("index.html", error=f"Errore: {str(e)}")
-    
-    return render_template("index.html")
 
 @app.route("/toggle_pseudonymize", methods=["POST"])
 def toggle_pseudonymize():

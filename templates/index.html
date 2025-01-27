@@ -91,6 +91,12 @@
     {% if preview %}
     <section class="py-5">
         <div class="container">
+            {% if suggestions %}
+            <div class="suggestions-container mb-4">
+                {{ suggestions | safe }}
+            </div>
+            {% endif %}
+
             {% if risk_analysis %}
             <div class="card mb-4">
                 <div class="card-header bg-info text-white">
@@ -161,6 +167,7 @@
             </div>
 
             <h2 class="text-center mb-4">Anteprima Dataset</h2>
+
             <div class="table-responsive" id="previewContainer">
                 {{ preview | safe }}
             </div>
@@ -295,13 +302,35 @@
                 }
             });
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const suggestions = document.querySelectorAll('.suggestions-container li');
+            suggestions.forEach(suggestion => {
+                suggestion.style.cursor = 'pointer';
+                suggestion.addEventListener('click', function () {
+                    const columnName = this.querySelector('strong').textContent;
+
+                    // Se il suggerimento riguarda la pseudonimizzazione
+                    if (this.closest('ul').previousElementSibling.textContent.includes('Pseudonimizzare')) {
+                        const checkbox = document.querySelector(`.pseudonymize-checkbox[value="${columnName}"]`);
+                        if (checkbox) checkbox.click();
+                    }
+
+                    // Se il suggerimento riguarda la rimozione
+                    if (this.closest('ul').previousElementSibling.textContent.includes('Rimuovere')) {
+                        const checkbox = document.querySelector(`.remove-checkbox[value="${columnName}"]`);
+                        if (checkbox) checkbox.click();
+                    }
+                });
+            });
+        });
     </script>
     {% endif %}
 
     <script type="text/babel">
         const PrivacyConsent = ({ onConsentChange }) => {
-    return (
-        <div className="bg-white rounded p-4 mt-4 shadow-sm">
+            return (
+                <div className="bg-white rounded p-4 mt-4 shadow-sm">
                     <h5 className="mb-3 text-primary fw-bold">Informativa sul Trattamento dei Dati</h5>
 
                     <div className="text-dark mb-4">
@@ -348,62 +377,62 @@
                         </div>
                     </div>
 
-            <div className="form-check mb-3 d-flex align-items-center">
-                <input
-                    type="checkbox"
-                    name="consent_process"
-                    id="consent_process"
-                    className="form-check-input me-2"
-                    onChange={(e) => onConsentChange(e.target.checked)}
-                    required
-                />
-                <label className="form-check-label text-dark" htmlFor="consent_process">
-                    Acconsento al trattamento dei dati per finalità di minimizzazione
-                </label>
-            </div>
+                    <div className="form-check mb-3 d-flex align-items-center">
+                        <input
+                            type="checkbox"
+                            name="consent_process"
+                            id="consent_process"
+                            className="form-check-input me-2"
+                            onChange={(e) => onConsentChange(e.target.checked)}
+                            required
+                        />
+                        <label className="form-check-label text-dark" htmlFor="consent_process">
+                            Acconsento al trattamento dei dati per finalità di minimizzazione
+                        </label>
+                    </div>
 
-            <div className="form-check mb-3 d-flex align-items-center">
-                <input
-                    type="checkbox"
-                    name="consent_analysis"
-                    id="consent_analysis"
-                    className="form-check-input me-2"
-                    onChange={(e) => onConsentChange(e.target.checked)}
-                    required
-                />
-                <label className="form-check-label text-dark" htmlFor="consent_analysis">
-                    Acconsento all'analisi del rischio privacy
-                </label>
-            </div>
+                    <div className="form-check mb-3 d-flex align-items-center">
+                        <input
+                            type="checkbox"
+                            name="consent_analysis"
+                            id="consent_analysis"
+                            className="form-check-input me-2"
+                            onChange={(e) => onConsentChange(e.target.checked)}
+                            required
+                        />
+                        <label className="form-check-label text-dark" htmlFor="consent_analysis">
+                            Acconsento all'analisi del rischio privacy
+                        </label>
+                    </div>
 
-            <div className="form-check d-flex align-items-center">
-                <input
-                    type="checkbox"
-                    name="privacy_consent"
-                    id="privacy_consent"
-                    className="form-check-input me-2"
-                    onChange={(e) => onConsentChange(e.target.checked)}
-                    required
-                />
-                <label className="form-check-label text-dark" htmlFor="privacy_consent">
-                    Ho letto e accetto l'
-                    <a href="/privacy" target="_blank" className="text-primary text-decoration-none hover-underline">
-                        informativa sulla privacy
-                    </a>
-                </label>
-            </div>
-        </div>
-    );
-};
+                    <div className="form-check d-flex align-items-center">
+                        <input
+                            type="checkbox"
+                            name="privacy_consent"
+                            id="privacy_consent"
+                            className="form-check-input me-2"
+                            onChange={(e) => onConsentChange(e.target.checked)}
+                            required
+                        />
+                        <label className="form-check-label text-dark" htmlFor="privacy_consent">
+                            Ho letto e accetto l'
+                            <a href="/privacy" target="_blank" className="text-primary text-decoration-none hover-underline">
+                                informativa sulla privacy
+                            </a>
+                        </label>
+                    </div>
+                </div>
+            );
+        };
 
-ReactDOM.render(
-    <PrivacyConsent
-        onConsentChange={(checked) => {
-            document.getElementById('uploadBtn').disabled = !checked;
-        }}
-    />,
-    document.getElementById('privacy-consent-container')
-);
+        ReactDOM.render(
+            <PrivacyConsent
+                onConsentChange={(checked) => {
+                    document.getElementById('uploadBtn').disabled = !checked;
+                }}
+            />,
+            document.getElementById('privacy-consent-container')
+        );
     </script>
 
     <footer class="bg-light py-4 mt-5">
@@ -416,4 +445,5 @@ ReactDOM.render(
     </footer>
 
 </body>
+
 </html>
